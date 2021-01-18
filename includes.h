@@ -193,6 +193,3 @@ typedef u_int32_t uint32_t;
 #endif
 
 #endif /* DROPBEAR_INCLUDES_H_ */
-
-
-#include "getpwnam-struct.h"

