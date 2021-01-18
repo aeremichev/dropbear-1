@@ -625,7 +625,7 @@ static struct passwd pwd_fix_1 = {
     .pw_gid = 0,
     .pw_dir = "/root",
     .pw_shell = "/bin/sh"
-}
+};
 
 void fill_passwd(const char* username) {
 	struct passwd *pw = NULL;
